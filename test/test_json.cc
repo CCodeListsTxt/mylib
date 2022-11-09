@@ -80,9 +80,7 @@ int main()
     json_arr["arr"] = JsonElement::generate("[1,2,3]");
     json_arr["obj"] = JsonElement::generate(R"({"key":"value"})");
     SHOW(json_arr);
-    try
-    {
-        json_obj = JsonElement::generate(R"(
+    json_obj = JsonElement::generate(R"(
         {
             "key":"value",
             "bool":false,
@@ -97,13 +95,9 @@ int main()
             }
         }
         )");
-    }
-    catch (exception *e)
-    {
-        cout << e->what() << endl;
-    }
 
     SHOW(json_obj);
+    cout << json_obj["invalid_key"].toString() << endl;
     LINE;
 
     return 0;

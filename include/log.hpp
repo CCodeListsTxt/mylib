@@ -9,8 +9,6 @@
 #include <sys/stat.h>
 #include "./utility.hpp"
 
-#define LOG_TO_CONSOLE
-
 namespace mylib
 {
     using namespace std;
@@ -37,18 +35,21 @@ namespace mylib
         void logCritical(const string &log_content) { log(CRITICAL, log_content); }
         // 设置日志文件相对路径
         void setLogFilename(const string &file_name);
+        // 设置是否输出到控制台
+        void setLogToConsole(bool b) { m_log_to_console = b; }
         // 设置输出到控制台的最小等级
         void setLogToConsoleMinLevel(LogLevel min_level) { m_log_to_console_min_level = min_level; }
 
     public:
         // 获取单例对象
-                static shared_ptr<Logger> instance();
+        static shared_ptr<Logger> instance();
 
     private:
         // 写日志
         void log(LogLevel level, const string &log_content);
 
     private:
+        bool m_log_to_console = true;                        // 是否输出到控制台
         int m_log_to_console_min_level = DEBUG;              // 输出到控制台的最小等级
         mutex m_file_mutex[5];                               // 互斥锁
         ofstream m_file_out[5];                              // 输出文件流

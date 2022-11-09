@@ -42,11 +42,9 @@ namespace mylib
         }
         string curr_time = localDateTimeString(); // 当前日期字符串
 
-#ifdef LOG_TO_CONSOLE
         // 输出到控制台时无需考虑加锁
-        if (level >= m_log_to_console_min_level)
+        if (m_log_to_console && level >= m_log_to_console_min_level)
             printf(LOG_LEVEL_FORMAT_STR[level].data(), curr_time.data(), LOG_LEVEL_STR[level].data(), log_content.data());
-#endif
 
         // 输出到文件
         lock_guard<mutex> lock(m_file_mutex[level]);
