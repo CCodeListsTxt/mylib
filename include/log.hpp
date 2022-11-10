@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <cassert>
 #include "./utility.hpp"
 
 namespace mylib
@@ -27,6 +28,9 @@ namespace mylib
         };
 
     public:
+        Logger() = default;
+        ~Logger();
+    public:
         // 写日志
         void logDebug(const string &log_content) { log(DEBUG, log_content); }
         void logInfo(const string &log_content) { log(INFO, log_content); }
@@ -38,7 +42,7 @@ namespace mylib
         // 设置是否输出到控制台
         void setLogToConsole(bool b) { m_log_to_console = b; }
         // 设置输出到控制台的最小等级
-        void setLogToConsoleMinLevel(LogLevel min_level) { m_log_to_console_min_level = min_level; }
+        void setLogToConsoleMinLevel(LogLevel min_level);
 
     public:
         // 获取单例对象

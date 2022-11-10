@@ -37,25 +37,25 @@ namespace mylib
 
     JsonElement::operator JsonElement::JsonBool() const
     {
-        checkType(JSON_BOOL, "Json对象类型错误::JsonBool " + to_string(__LINE__));
+        checkType(JSON_BOOL, ERRORINFO_JSON_TYPE_MISMATCH);
         return getBool();
     }
 
     JsonElement::operator JsonInt() const
     {
-        checkType(JSON_INT, "Json对象类型错误::JsonInt " + to_string(__LINE__));
+        checkType(JSON_INT, ERRORINFO_JSON_TYPE_MISMATCH);
         return getInt();
     }
 
     JsonElement::operator JsonElement::JsonFloat() const
     {
-        checkType(JSON_FLOAT, "Json对象类型错误::JsonFloat " + to_string(__LINE__));
+        checkType(JSON_FLOAT, ERRORINFO_JSON_TYPE_MISMATCH);
         return getFloat();
     }
 
     JsonElement::operator JsonElement::JsonString() const
     {
-        checkType(JSON_STRING, "Json对象类型错误::JsonString " + to_string(__LINE__));
+        checkType(JSON_STRING, ERRORINFO_JSON_TYPE_MISMATCH);
         return *getString();
     }
 
@@ -89,7 +89,7 @@ namespace mylib
 
     JsonElement JsonElement::pop()
     {
-        checkType(JSON_ARRAY, "Json对象类型错误::JsonArray " + to_string(__LINE__));
+        checkType(JSON_ARRAY, ERRORINFO_JSON_TYPE_MISMATCH);
         if (size() == 0)
             return JsonElement();
         JsonElement ret = getArray()->back();
@@ -99,7 +99,7 @@ namespace mylib
 
     void JsonElement::erase(size_t index)
     {
-        checkType(JSON_ARRAY, "Json对象类型错误::JsonArray " + to_string(__LINE__));
+        checkType(JSON_ARRAY, ERRORINFO_JSON_TYPE_MISMATCH);
         shared_ptr<JsonArray> arr = getArray();
         if (index < arr->size())
             arr->erase(arr->begin() + index);
@@ -107,13 +107,13 @@ namespace mylib
 
     vector<JsonElement>::iterator JsonElement::begin() const
     {
-        checkType(JSON_ARRAY, "此JsonElement对象不可遍历 " + to_string(__LINE__));
+        checkType(JSON_ARRAY, ERRORINFO_JSON_TYPE_MISMATCH);
         return getArray()->begin();
     }
 
     vector<JsonElement>::iterator JsonElement::end() const
     {
-        checkType(JSON_ARRAY, "此JsonElement对象不可遍历 " + to_string(__LINE__));
+        checkType(JSON_ARRAY, ERRORINFO_JSON_TYPE_MISMATCH);
         return getArray()->end();
     }
 
@@ -144,13 +144,13 @@ namespace mylib
 
     bool JsonElement::has(const string &key) const
     {
-        checkType(JSON_OBJECT, "Json对象类型错误::JsonObject " + to_string(__LINE__));
+        checkType(JSON_OBJECT, ERRORINFO_JSON_TYPE_MISMATCH);
         return getObject()->contains(key);
     }
 
     void JsonElement::erase(const string &key)
     {
-        checkType(JSON_OBJECT, "Json对象类型错误::JsonObject " + to_string(__LINE__));
+        checkType(JSON_OBJECT, ERRORINFO_JSON_TYPE_MISMATCH);
         getObject()->erase(key);
     }
 
@@ -231,7 +231,7 @@ namespace mylib
         else if (isObject(ch))
             return parseObject();
         else
-            throw new invalid_argument("Json字符串无效 " + to_string(__LINE__));
+            throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
     }
 
     JsonElement JsonElement::JsonParser::parseNull()
@@ -242,7 +242,7 @@ namespace mylib
             skipSpace();
             return JsonElement();
         }
-        throw new invalid_argument("Json字符串无效::null " + to_string(m_index) + " " + to_string(__LINE__));
+        throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
     }
 
     JsonElement JsonElement::JsonParser::parseBool()
@@ -259,7 +259,7 @@ namespace mylib
             skipSpace();
             return JsonElement(false);
         }
-        throw new invalid_argument("Json字符串无效::bool " + to_string(m_index) + " " + to_string(__LINE__));
+        throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
     }
 
     JsonElement JsonElement::JsonParser::parseNumber()
@@ -281,12 +281,12 @@ namespace mylib
             else if (m_str[m_index] == '.' && is_int)
                 is_int = false;
             else if (m_str[m_index] == '.')
-                throw new invalid_argument("Json字符串无效::number " + to_string(m_index) + " " + to_string(__LINE__));
+                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
             else
                 break;
         }
         if (number_count == 0)
-            throw new invalid_argument("Json字符串无效::number " + to_string(m_index) + " " + to_string(__LINE__));
+            throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
         // 转换
         if (is_int)
         {
@@ -318,7 +318,6 @@ namespace mylib
             else if (ch == '\\')
             {
                 ch = m_str[++m_index];
-                u32string unicode_str;
                 switch (ch)
                 {
                 case '"':
@@ -342,36 +341,35 @@ namespace mylib
                 case 't':
                     ret += '\t';
                     break;
-                // \uxxxx，unicode字符
+                // \uxxxx，unicode转义
                 case 'u':
-                    // \u后必须是四个十六进制的数
+                    // \u后必须是四个十六进制的数值字符
                     if (m_index + 4 >= m_str.size())
-                        throw new invalid_argument("Json字符串无效::string " + to_string(m_index) + " " + to_string(__LINE__));
+                        throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
                     for (int i = 1; i <= 4; ++i)
                         if (!isHex(m_str[m_index + i]))
-                            throw new invalid_argument("Json字符串无效::string " + to_string(m_index) + " " + to_string(__LINE__));
+                            throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
                     // unicode编码转到string
-                    unicode_str += (char32_t)stoul(m_str.substr(m_index + 1, 4), nullptr, 16);
-                    ret += wstring_convert<codecvt_utf8<char32_t>, char32_t>{}.to_bytes(unicode_str);
-
+                    ret += unicodeToString(stoul(m_str.substr(m_index + 1, 4), nullptr, 16));
                     m_index += 4;
                     skipSpace();
                     break;
                 default:
-                    throw new invalid_argument("Json字符串无效::string " + to_string(m_index) + " " + to_string(__LINE__));
+                    throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
                 }
             }
             else
                 ret += ch;
         }
-        throw new invalid_argument("Json字符串无效::string " + to_string(m_index) + " " + to_string(__LINE__));
+        throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
     }
 
     JsonElement JsonElement::JsonParser::parseArray()
     {
-        m_index += 1;
+        m_index += 1; // 忽略开始的 '['
         skipSpace();
         vector<JsonElement> ret;
+        // 空json_array
         if (m_str[m_index] == ']')
         {
             m_index += 1;
@@ -381,7 +379,7 @@ namespace mylib
         while (true)
         {
             ret.push_back(parse());
-            // 闭合array
+            // 闭合json_array
             if (m_str[m_index] == ']')
             {
                 m_index += 1;
@@ -389,7 +387,7 @@ namespace mylib
                 return JsonElement(ret);
             }
             if (m_str[m_index] != ',' || m_index >= m_str.size())
-                throw new invalid_argument("Json字符串无效::array " + to_string(m_index) + " " + to_string(__LINE__));
+                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
             m_index += 1;
             skipSpace();
         }
@@ -401,6 +399,7 @@ namespace mylib
         m_index += 1;
         skipSpace();
         map<string, JsonElement> ret;
+        // 空json_object
         if (m_str[m_index] == '}')
         {
             m_index += 1;
@@ -410,12 +409,12 @@ namespace mylib
         while (true)
         {
             if (m_index > m_str.size())
-                throw new invalid_argument("Json字符串无效::object " + to_string(m_index) + " " + to_string(__LINE__));
+                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
             // 解析键
             JsonElement key = parseString();
             //
             if (m_str[m_index] != ':')
-                throw new invalid_argument("Json字符串无效::object " + to_string(m_index) + " " + to_string(__LINE__));
+                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
             m_index += 1;
             skipSpace();
             // 解析值
@@ -428,7 +427,7 @@ namespace mylib
                 return ret;
             }
             if (m_str[m_index] != ',')
-                throw new invalid_argument("Json字符串无效::object " + to_string(m_index) + " " + to_string(__LINE__));
+                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
             m_index += 1;
             skipSpace();
         }
@@ -437,7 +436,7 @@ namespace mylib
 
     void JsonElement::JsonParser::skipSpace()
     {
-        while (m_str[m_index] == ' ' || m_str[m_index] == '\n' || m_str[m_index] == '\t')
+        while (isSpace(m_str[m_index]))
             m_index += 1;
     }
 }

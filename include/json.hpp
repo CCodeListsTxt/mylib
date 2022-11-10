@@ -1,12 +1,14 @@
 #pragma once
 
-#include <locale>
-#include <codecvt>
 #include <string>
 #include <vector>
 #include <map>
 #include <variant>
 #include <memory>
+#include "./utility.hpp"
+
+#define ERRORINFO_JSON_TYPE_MISMATCH "Json对象类型不匹配。错误行号:" + to_string(__LINE__)
+#define ERRORINFO_JSON_STRING_INVALID "Json字符串无效。错误行号:" + to_string(__LINE__)
 
 namespace mylib
 {
@@ -34,7 +36,7 @@ namespace mylib
         };
 
     public:
-        JsonElement() {}
+        JsonElement() = default;
         JsonElement(nullptr_t) {}
         JsonElement(JsonBool b) : m_type(JSON_BOOL), m_value(b) {}
         JsonElement(JsonInt n) : m_type(JSON_INT), m_value(n) {}
@@ -43,6 +45,7 @@ namespace mylib
         JsonElement(const JsonString &str) : m_type(JSON_STRING), m_value(make_shared<JsonString>(str)) {}
         JsonElement(JsonArray arr) : m_type(JSON_ARRAY), m_value(make_shared<JsonArray>(arr)) {}
         JsonElement(JsonObject obj) : m_type(JSON_OBJECT), m_value(make_shared<JsonObject>(obj)) {}
+        ~JsonElement() = default;
         // 浅拷贝以提高效率
         JsonElement(const JsonElement &other) : m_type(other.m_type), m_value(other.m_value) {}
         JsonElement &operator=(const JsonElement &other);
