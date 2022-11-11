@@ -144,7 +144,7 @@ namespace mylib
     {
         size_t pos = findFirstOf(m_str, m_index, ' ');
         if (pos == string::npos)
-            throw new invalid_argument(ERROR_HTTP_REQUEST_LINE_STRING_INVALID);
+            __throw_invalid_argument("Http Request Line Invalid");
         string method_str = trim(toUpper(m_str.substr(m_index, pos - m_index)));
         request.setMethod(HttpRequest::stringToMethod(method_str));
         m_index = pos + 1;
@@ -154,7 +154,7 @@ namespace mylib
     {
         size_t pos = findFirstOf(m_str, m_index, ' ');
         if (pos == string::npos)
-            throw new invalid_argument(ERROR_HTTP_REQUEST_LINE_STRING_INVALID);
+            __throw_invalid_argument("");
         request.setUrl(trim(m_str.substr(m_index, pos - m_index)));
         m_index = pos + 1;
     }
@@ -163,7 +163,7 @@ namespace mylib
     {
         size_t pos = findFirstOf(m_str, m_index, CR);
         if (pos == string::npos || m_str[pos + 1] != LF)
-            throw new invalid_argument(ERROR_HTTP_REQUEST_LINE_STRING_INVALID);
+            __throw_invalid_argument("Http Request Line Innvalid");
         string version_str = trim(toUpper(m_str.substr(m_index, pos - m_index)));
         request.setVersion(HttpRequest::stringToVersion(version_str));
         m_index = pos + 2;
@@ -180,7 +180,7 @@ namespace mylib
     {
         size_t pos = findFirstOf(m_str, m_index, ' ');
         if (pos == string::npos)
-            throw new invalid_argument(ERROR_HTTP_RESPONSE_LINE_STARING_INVALID);
+            __throw_invalid_argument("Http Response Line Invalid");
         string version_str = trim(toUpper(m_str.substr(m_index, pos - m_index)));
         response.setVersion(HttpResponse::stringToVersion(version_str));
         m_index = pos + 1;
@@ -190,7 +190,7 @@ namespace mylib
     {
         size_t pos = findFirstOf(m_str, m_index, ' ');
         if (pos == string::npos)
-            throw new invalid_argument(ERROR_HTTP_RESPONSE_LINE_STARING_INVALID);
+            __throw_invalid_argument("Http Response Line Invalid");
         string status_str = trim(toUpper(m_str.substr(m_index, pos - m_index)));
         response.setStatus(HttpResponse::stringToStatus(status_str));
         m_index = pos + 1;
@@ -200,7 +200,7 @@ namespace mylib
     {
         size_t pos = findFirstOf(m_str, m_index, CR);
         if (pos == string::npos || m_str[pos + 1] != LF)
-            throw new invalid_argument(ERROR_HTTP_RESPONSE_LINE_STARING_INVALID);
+            __throw_invalid_argument("Http Response Line Invalid");
         string status_msg = trim(m_str.substr(m_index, pos - m_index));
         response.setStatusMsg(status_msg);
         m_index = pos + 2;
@@ -221,14 +221,14 @@ namespace mylib
             // 键
             size_t pos = findFirstOf(m_str, m_index, ':');
             if (pos == string::npos)
-                throw new invalid_argument(ERROR_HTTP_HEADERS_STRING_INVALID);
+                __throw_invalid_argument("Http Context Headers Invalid");
             string key = trim(m_str.substr(m_index, pos - m_index));
             m_index = pos + 1;
 
             // 值
             pos = findFirstOf(m_str, m_index, CR);
             if (m_str[pos + 1] != LF)
-                throw new invalid_argument(ERROR_HTTP_HEADERS_STRING_INVALID);
+                __throw_invalid_argument("Http Context Headers Invalid");
             string value = trim(m_str.substr(m_index, pos - m_index));
             m_index = pos + 2;
 

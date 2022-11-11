@@ -41,7 +41,7 @@ namespace mylib
     void Logger::log(LogLevel level, const string &log_content)
     {
         if (!m_file_out[level].is_open())
-            throw new std::runtime_error("日志文件尚未打开");
+            __throw_invalid_argument("Not Open Log File");
         string curr_time = localDateTimeString(); // 当前日期字符串
 
         // 输出到控制台时无需考虑加锁

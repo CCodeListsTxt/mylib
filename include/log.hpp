@@ -10,10 +10,10 @@
 #include <cassert>
 #include "./utility.hpp"
 
+using namespace std;
+
 namespace mylib
 {
-    using namespace std;
-
     class Logger : public Noncopyable
     {
     public:
@@ -30,6 +30,7 @@ namespace mylib
     public:
         Logger() = default;
         ~Logger();
+
     public:
         // 写日志
         void logDebug(const string &log_content) { log(DEBUG, log_content); }

@@ -211,7 +211,7 @@ namespace mylib
     void JsonElement::checkType(ElementType type, const string &msg) const
     {
         if (m_type != type)
-            throw new runtime_error(msg);
+            __throw_runtime_error(msg.data());
     }
 
     JsonElement JsonElement::JsonParser::parse()
@@ -231,7 +231,7 @@ namespace mylib
         else if (isObject(ch))
             return parseObject();
         else
-            throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+            __throw_invalid_argument("Json String Invalid");
     }
 
     JsonElement JsonElement::JsonParser::parseNull()
@@ -242,7 +242,7 @@ namespace mylib
             skipSpace();
             return JsonElement();
         }
-        throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+        __throw_invalid_argument("Json String Invalid");
     }
 
     JsonElement JsonElement::JsonParser::parseBool()
@@ -259,7 +259,7 @@ namespace mylib
             skipSpace();
             return JsonElement(false);
         }
-        throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+        __throw_invalid_argument("Json String Invalid");
     }
 
     JsonElement JsonElement::JsonParser::parseNumber()
@@ -281,12 +281,14 @@ namespace mylib
             else if (m_str[m_index] == '.' && is_int)
                 is_int = false;
             else if (m_str[m_index] == '.')
-                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+                __throw_invalid_argument("Json String Invalid");
+
             else
                 break;
         }
         if (number_count == 0)
-            throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+            __throw_invalid_argument("Json String Invalid");
+
         // 转换
         if (is_int)
         {
@@ -345,23 +347,25 @@ namespace mylib
                 case 'u':
                     // \u后必须是四个十六进制的数值字符
                     if (m_index + 4 >= m_str.size())
-                        throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+                        __throw_invalid_argument("Json String Invalid");
+
                     for (int i = 1; i <= 4; ++i)
                         if (!isHex(m_str[m_index + i]))
-                            throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+                            __throw_invalid_argument("Json String Invalid");
+
                     // unicode编码转到string
                     ret += unicodeToString(stoul(m_str.substr(m_index + 1, 4), nullptr, 16));
                     m_index += 4;
                     skipSpace();
                     break;
                 default:
-                    throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+                    __throw_invalid_argument("Json String Invalid");
                 }
             }
             else
                 ret += ch;
         }
-        throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+        __throw_invalid_argument("Json String Invalid");
     }
 
     JsonElement JsonElement::JsonParser::parseArray()
@@ -387,7 +391,8 @@ namespace mylib
                 return JsonElement(ret);
             }
             if (m_str[m_index] != ',' || m_index >= m_str.size())
-                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+                __throw_invalid_argument("Json String Invalid");
+
             m_index += 1;
             skipSpace();
         }
@@ -408,17 +413,21 @@ namespace mylib
         }
         while (true)
         {
+            // 越界检测
             if (m_index > m_str.size())
-                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+                __throw_invalid_argument("Json String Invalid");
+
             // 解析键
             JsonElement key = parseString();
-            //
+            
             if (m_str[m_index] != ':')
-                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+                __throw_invalid_argument("Json String Invalid");
             m_index += 1;
             skipSpace();
+
             // 解析值
             ret.emplace(key.asString(), parse());
+            
             // 闭合object
             if (m_str[m_index] == '}')
             {
@@ -427,7 +436,7 @@ namespace mylib
                 return ret;
             }
             if (m_str[m_index] != ',')
-                throw new invalid_argument(ERRORINFO_JSON_STRING_INVALID);
+                __throw_invalid_argument("Json String Invalid");
             m_index += 1;
             skipSpace();
         }

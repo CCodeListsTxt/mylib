@@ -2,10 +2,6 @@
 #include <map>
 #include "utility.hpp"
 
-#define ERROR_HTTP_REQUEST_LINE_STRING_INVALID ("HTTP请求行错误。" + to_string(__LINE__) + "行\n" + m_str)
-#define ERROR_HTTP_RESPONSE_LINE_STARING_INVALID ("HTTP响应行错误。" + to_string(__LINE__) + "行\n" + m_str)
-#define ERROR_HTTP_HEADERS_STRING_INVALID ("HTTP报文头错误。" + to_string(__LINE__) + "行\n" + m_str)
-
 #define CONTENT_TYPE "Content-Type"
 #define CONTENT_LANGUAGE "Content-Language"
 #define CONTENT_LENGTH "Content-Length"
@@ -13,10 +9,10 @@
 #define CONTENT_TYPE "Content-Type"
 #define COOKIE "Cookie"
 
+using namespace std;
+
 namespace mylib
 {
-    using namespace std;
-
     class HttpContext
     {
     public:
@@ -58,9 +54,6 @@ namespace mylib
 
         string getContentLength() const { return getHeader(CONTENT_LENGTH); }
         void setContentLength(const string &value) { setHeader(CONTENT_LENGTH, value); }
-
-        string getContentType() const { return getHeader(CONTENT_TYPE); }
-        void setContentType(const string &value) { setHeader(CONTENT_TYPE, value); }
 
         string getCookie() const { return getHeader(COOKIE); }
         void setCookie(const string &value) { setHeader(COOKIE, value); }

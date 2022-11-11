@@ -8,10 +8,10 @@
 #include <codecvt>
 #include <iostream>
 
+using namespace std;
+
 namespace mylib
 {
-    using namespace std;
-
     class Noncopyable
     {
     protected:

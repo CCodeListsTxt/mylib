@@ -1,30 +1,15 @@
-// #include "../include/log.hpp"
-// #include "../include/json.hpp"
 #include <iostream>
-#include <map>
 #include <string>
 
-// using namespace mylib;
 using namespace std;
-
-string func()
-{
-    map<string, string> k;
-    try
-    {
-        return k.at("wjdqil");
-    }
-    catch (...)
-    {
-        cout << "hello";
-        return "hello";
-    }
-}
 
 int main()
 {
-    map<string, string> k;
-    func();
+    char p[] = "hello";
+    string str(p);
+    cout << str << endl;
+    p[0] = 'a';
+    cout << str <<endl;
 
     return 0;
 }

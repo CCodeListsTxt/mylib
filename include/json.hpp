@@ -10,9 +10,10 @@
 #define ERRORINFO_JSON_TYPE_MISMATCH "Json对象类型不匹配。错误行号:" + to_string(__LINE__)
 #define ERRORINFO_JSON_STRING_INVALID "Json字符串无效。错误行号:" + to_string(__LINE__)
 
+using namespace std;
+
 namespace mylib
 {
-    using namespace std;
     class JsonElement
     {
     public:
